@@ -17,7 +17,7 @@ resource "google_compute_instance" "name" {
 
   boot_disk {
     initialize_params {
-      image = "projects/centos-cloud/global/images/family/centos-stream-9"
+      image = "centos-stream-9"
     }
   }
 
