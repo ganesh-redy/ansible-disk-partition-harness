@@ -2,6 +2,9 @@
 - name: Example Ansible Playbook
   hosts: all
   become: true
+  vars:
+    ansible_user: sa_106301816075024666979
+   
 
   pre_tasks:
     - name: Update apt cache
