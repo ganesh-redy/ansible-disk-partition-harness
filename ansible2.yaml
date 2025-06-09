@@ -1,16 +1,15 @@
 ---
-- name: Example Ansible Playbook
+- name: Ansible Playbook for CentOS Stream 9
   hosts: all
   become: true
   vars:
     ansible_user: sa_106301816075024666979
-   
+    ansible_ssh_private_key_file: id_rsa
 
   pre_tasks:
-    - name: Update apt cache
-      apt:
+    - name: Update dnf cache
+      dnf:
         update_cache: yes
-        cache_valid_time: 3600
 
   roles:
     - geerlingguy.apache
