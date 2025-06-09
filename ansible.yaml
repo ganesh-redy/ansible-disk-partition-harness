@@ -1,0 +1,77 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Install required packages
+      yum:
+        name:
+          - yum-utils
+          - parted
+          - xfsprogs
+        state: present
+
+    - name: Create first partition on /dev/sdb (ext4)
+      parted:
+        device: /dev/sdb
+        number: 1
+        state: present
+        part_type: primary
+        fs_type: ext4
+        start: 1MiB
+        end: 512MiB
+
+    - name: Create second partition on /dev/sdb (xfs)
+      parted:
+        device: /dev/sdb
+        number: 2
+        state: present
+        part_type: primary
+        fs_type: xfs
+        start: 512MiB
+        end: 100%
+
+    - name: Make ext4 filesystem on /dev/sdb1
+      filesystem:
+        fstype: ext4
+        dev: /dev/sdb1
+
+    - name: Make xfs filesystem on /dev/sdb2
+      filesystem:
+        fstype: xfs
+        dev: /dev/sdb2
+
+    - name: Create mount directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - /data1
+        - /data2
+
+    - name: Mount /dev/sdb1 to /data1
+      mount:
+        path: /data1
+        src: /dev/sdb1
+        fstype: ext4
+        state: mounted
+
+    - name: Mount /dev/sdb2 to /data2
+      mount:
+        path: /data2
+        src: /dev/sdb2
+        fstype: xfs
+        state: mounted
+
+    - name: Create test file in /data1
+      copy:
+        content: "This is ext4 partition.\n"
+        dest: /data1/file1.txt
+
+    - name: Create test file in /data2
+      copy:
+        content: "This is xfs partition.\n"
+        dest: /data2/file2.txt
+   - name: show lsblk
+     shell: lsblk -T > /dev/pts/1
+     
